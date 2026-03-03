@@ -4,6 +4,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@dmuy/timepicker@2.0.2/dist/mdtimepicker.min.css">
 <style>
     .map-container { border-radius: 12px; overflow: hidden; border: 2px solid #e2e8f0; position: relative; }
     .map-overlay { position: absolute; top: 10px; right: 10px; z-index: 1000; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 250px; }
@@ -47,8 +48,8 @@
                         <input type="date" name="event_date" class="form-control" value="{{ old('event_date') }}" required>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Jam (WIB)</label>
-                        <input type="time" name="jam" class="form-control" value="{{ old('jam') }}">
+                        <label class="form-label">Jam</label>
+                        <input type="text" name="jam" class="form-control timepicker bg-white" placeholder="Pilih Jam (AM/PM)" value="{{ old('jam') }}" readonly style="cursor: pointer;">
                     </div>
                 </div>
 
@@ -61,7 +62,7 @@
                 
                 <div class="mb-3">
                     <label class="form-label"><i class="fa-regular fa-image me-1"></i> Poster Kegiatan (Gambar)</label>
-                    <input type="file" name="image" class="form-control" accept="image/*">
+                    <input type="file" name="image" id="imageInput" class="form-control" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
                     <small class="text-muted mt-1 d-block">Rekomendasi ukuran: 1200x630 .jpg/.png</small>
                 </div>
 
@@ -88,12 +89,13 @@
                 
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="mb-3">
+                        <div class="mb-3 position-relative">
                             <label class="form-label">Cari & Tandai Peta</label>
                             <div class="input-group">
-                                <input type="text" id="location-search" class="form-control" placeholder="Contoh: Simpang Lima">
+                                <input type="text" id="location-search" class="form-control" placeholder="Contoh: Simpang Lima" onkeyup="delaySuggestLocation()" autocomplete="off">
                                 <button type="button" onclick="searchLocation()" class="btn btn-dark"><i class="fa-solid fa-magnifying-glass"></i></button>
                             </div>
+                            <ul id="suggestion-list" class="list-group position-absolute w-100 shadow d-none" style="z-index: 1050; max-height: 250px; overflow-y: auto; top: 100%;"></ul>
                             <small class="text-muted d-block mt-2">Cari nama tempat, lalu <b>klik hasil pencarian atau map area</b>.</small>
                         </div>
 
@@ -128,12 +130,31 @@
 
 @section('scripts')
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@dmuy/timepicker@2.0.2/dist/mdtimepicker.min.js"></script>
 <script>
+    // Inisialisasi Material Design Time Picker dengan AM/PM (12-hour format)
+    mdtimepicker('.timepicker', {
+        format: 'hh:mm tt',
+        type: 'time',
+        hourPadding: true,
+        is24hour: false,
+        theme: 'red'
+    });
+
     // Koordinat pusat default (Semarang)
     var default_lat = -6.9932;
     var default_lon = 110.4203;
 
-    var map = L.map('map').setView([default_lat, default_lon], 13);
+    var map = L.map('map', {
+        center: [default_lat, default_lon],
+        zoom: 13,
+        minZoom: 11,
+        maxBounds: [
+            [-7.15, 110.20], // Batas Barat Daya (South-West)
+            [-6.85, 110.55]  // Batas Timur Laut (North-East)
+        ],
+        maxBoundsViscosity: 1.0 // Mencegah map digeser keluar batas
+    });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
@@ -166,7 +187,7 @@
         let query = document.getElementById('location-search').value;
         if(query.trim() === '') return;
 
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`)
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1&viewbox=110.20,-6.85,110.55,-7.15&bounded=1`)
         .then(res => res.json())
         .then(data => {
             if (data.length > 0) {
@@ -177,11 +198,76 @@
                 map.flyTo([lat, lon], 16);
                 marker.setLatLng([lat, lon]).bindPopup(name).openPopup();
                 updateFormFromMarker(lat, lon, name);
+                document.getElementById('suggestion-list').classList.add('d-none');
             } else {
-                alert('Lokasi spesifik tidak ditemukan, cobalah keyword yang lebih luas.');
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Pencarian Gagal',
+                    text: 'Lokasi spesifik tidak ditemukan. Cobalah memakai kata kunci yang lebih luas atau nama jalan besar.',
+                    confirmButtonColor: '#ef4444'
+                });
             }
         });
     }
+
+    // 🔍 AUTOCOMPLETE SUGGESTIONS
+    let suggestTimeout;
+    function delaySuggestLocation() {
+        clearTimeout(suggestTimeout);
+        let query = document.getElementById('location-search').value;
+        let list = document.getElementById('suggestion-list');
+        
+        if(query.trim().length < 3) {
+            list.classList.add('d-none');
+            return;
+        }
+        
+        suggestTimeout = setTimeout(() => {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=5&viewbox=110.20,-6.85,110.55,-7.15&bounded=1`)
+            .then(res => res.json())
+            .then(data => {
+                list.innerHTML = '';
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        let li = document.createElement('li');
+                        li.className = 'list-group-item list-group-item-action px-3 py-2';
+                        li.style.cursor = 'pointer';
+                        
+                        let parts = item.display_name.split(',');
+                        let mainName = parts[0];
+                        let address = parts.slice(1).join(',').trim();
+
+                        li.innerHTML = `<div class="fw-bold"><i class="fa-solid fa-map-pin text-danger me-2"></i>${mainName}</div>
+                                        <div class="text-muted small ms-4 text-truncate">${address}</div>`;
+                        
+                        li.onclick = function() {
+                            map.flyTo([item.lat, item.lon], 16);
+                            marker.setLatLng([item.lat, item.lon]).bindPopup(item.display_name).openPopup();
+                            updateFormFromMarker(item.lat, item.lon, item.display_name);
+                            document.getElementById('location-search').value = mainName;
+                            list.classList.add('d-none');
+                        };
+                        list.appendChild(li);
+                    });
+                    list.classList.remove('d-none');
+                } else {
+                    list.innerHTML = `<li class="list-group-item text-muted text-center py-2 small">Lokasi tidak ditemukan</li>`;
+                    list.classList.remove('d-none');
+                }
+            });
+        }, 500);
+    }
+
+    // Hilangkan dropdown jika klik di luar box pencarian
+    document.addEventListener('click', function(e) {
+        let searchBox = document.getElementById('location-search');
+        let suggestList = document.getElementById('suggestion-list');
+        if(searchBox && suggestList) {
+            if(!searchBox.contains(e.target) && !suggestList.contains(e.target)) {
+                suggestList.classList.add('d-none');
+            }
+        }
+    });
 
     // Saat map diclick
     map.on('click', function(e){
@@ -196,6 +282,23 @@
         let lat = marker.getLatLng().lat;
         let lon = marker.getLatLng().lng;
         updateFormFromMarker(lat, lon, null);
+    });
+
+    // 🛡️ Alert Validasi File JPG/PNG
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        var file = this.files[0];
+        if (file) {
+            var allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            if (!allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Format Ditolak!',
+                    text: 'Mohon hanya unggah file gambar atau poster dengan format murni .JPG atau .PNG saja.',
+                    confirmButtonColor: '#ef4444'
+                });
+                this.value = ''; // Reset file input
+            }
+        }
     });
 </script>
 @endsection

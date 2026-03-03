@@ -48,12 +48,12 @@ class EventController extends Controller
             $videoPath = $request->file('video')->store('events', 'public');
         }
 
-       Event::create([
-    'title'       => $request->title,
-    'category_id' => $request->category_id,
-    'event_date'  => $request->event_date,
-    'jam'         => $request->jam,
-    'description' => $request->description,
+    Event::create([
+     'title'       => $request->title,
+     'category_id' => $request->category_id,
+     'event_date'  => $request->event_date,
+     'jam'         => \Carbon\Carbon::parse($request->jam)->format('H:i'),
+     'description' => $request->description,
     'location'    => $request->location,
     'latitude'    => $request->latitude,
     'longitude'   => $request->longitude,
@@ -104,7 +104,7 @@ class EventController extends Controller
         'title'       => $request->title,
         'category_id' => $request->category_id,
         'event_date'  => $request->event_date,
-        'jam'         => $request->jam,
+        'jam'         => \Carbon\Carbon::parse($request->jam)->format('H:i'),
         'description' => $request->description,
         'location'    => $request->location,
         'latitude'    => $request->latitude,   // 🔥 WAJIB

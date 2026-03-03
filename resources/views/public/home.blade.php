@@ -9,6 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <style>
         /* --- 1. Global Styles --- */
@@ -347,11 +348,11 @@
                 </div>
                 Cari Tanggal Acara
             </h4>
-            <form action="{{ route('home') }}" method="GET" class="date-input-wrapper m-0">
-                <input type="date" name="date" class="form-control-date" value="{{ request('date') }}" onchange="this.form.submit()">
-                @if(request('date'))
+            <form action="{{ route('home') }}" method="GET" class="date-input-wrapper m-0" id="filterForm">
+                <input type="text" id="dateFilter" name="date_range" class="form-control-date" value="{{ request('date_range') }}" placeholder="Pilih Rentang Waktu..." readonly>
+                @if(request('date_range'))
                     <a href="{{ route('home') }}" class="btn-clear-filter" title="Hapus Filter">
-                        <i class="fa-solid fa-xmark"></i> Hapus Filter
+                        <i class="fa-solid fa-xmark"></i> Hapus
                     </a>
                 @endif
             </form>
@@ -362,7 +363,12 @@
                 <div class="col-12">
                     <h3 class="section-title">
                         <span class="text-gradient-today">
-                            <i class="fa-solid fa-calendar-check"></i> Acara pada {{ $filterDate->isoFormat('dddd, D MMMM Y') }}
+                            <i class="fa-solid fa-calendar-check"></i> Acara 
+                            @if($startDate->isSameDay($endDate))
+                                {{ $startDate->isoFormat('D MMMM Y') }}
+                            @else
+                                {{ $startDate->isoFormat('D MMM Y') }} - {{ $endDate->isoFormat('D MMM Y') }}
+                            @endif
                         </span>
                     </h3>
                 </div>
@@ -371,7 +377,7 @@
                     @forelse($filteredEvents as $index => $event)
                         <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ 100 * ($index % 3) }}">
                             <a href="/kegiatan/{{ $event->id }}" class="event-card">
-                                <div class="badge-koko bg-white text-indigo-600" style="color:#4338ca;">{{ $filterDate->format('d/m/Y') }}</div>
+                                <div class="badge-koko bg-white text-indigo-600" style="color:#4338ca;">{{ \Carbon\Carbon::parse($event->event_date)->format('d/m/Y') }}</div>
                                 <div class="img-wrapper">
                                     @if($event->image)
                                         <img src="{{ asset('storage/' . $event->image) }}" class="card-img-top" alt="{{ $event->title }}">
@@ -498,8 +504,11 @@
 
     </div>
 
+    @include('public.components.footer')
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Inisialisasi library animasi AOS
@@ -508,6 +517,24 @@
                 once: true,
                 offset: 50,
                 easing: 'ease-out-cubic',
+            });
+
+            // Inisialisasi Flatpickr Range Mode
+            flatpickr("#dateFilter", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                onChange: function(selectedDates, dateStr, instance) {
+                    // Hanya submit otomatis jika user sudah memilih kedua tanggal, atau click di single day
+                    if (selectedDates.length === 2 || (selectedDates.length === 1 && instance.isOpen === false)) {
+                        document.getElementById('filterForm').submit();
+                    }
+                },
+                onClose: function(selectedDates, dateStr, instance) {
+                    // Backup submit kalau window ditutup manual
+                    if (dateStr && selectedDates.length > 0) {
+                        document.getElementById('filterForm').submit();
+                    }
+                }
             });
         });
     </script>

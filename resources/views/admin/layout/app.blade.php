@@ -14,9 +14,9 @@
 
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --sidebar-bg: #1e1e2f;
+            --primary: #ef4444;
+            --primary-hover: #dc2626;
+            --sidebar-bg: #111827;
             --sidebar-hover: rgba(255,255,255,0.08);
             --bg-body: #f1f5f9;
             --text-dark: #1e293b;
@@ -51,7 +51,7 @@
             gap: 12px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .sidebar-header i { font-size: 1.5rem; color: #818cf8; }
+        .sidebar-header i { font-size: 1.5rem; color: #f87171; }
         .sidebar-header h5 { margin: 0; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.5px; }
 
         .sidebar-menu {
@@ -95,8 +95,8 @@
             color: #fff;
             transform: translateX(5px);
         }
-        .sidebar a:hover i { transform: scale(1.1); color: #818cf8; }
-        .sidebar a.active { background: linear-gradient(135deg, var(--primary), #3b82f6); box-shadow: 0 4px 15px rgba(79,70,229,0.3); }
+        .sidebar a:hover i { transform: scale(1.1); color: #f87171; }
+        .sidebar a.active { background: linear-gradient(135deg, var(--primary), #b91c1c); box-shadow: 0 4px 15px rgba(239,68,68,0.3); }
         .sidebar a.active i { color: #fff; }
         
         .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
@@ -130,7 +130,7 @@
         
         .admin-profile { display: flex; align-items: center; gap: 12px; background: white; padding: 6px 16px 6px 6px; border-radius: 50px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; }
         .admin-profile:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #cbd5e1; }
-        .profile-avatar { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary), #ec4899); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .profile-avatar { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary), #991b1b); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
         .profile-name { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
 
         /* CONTENT AREA */
@@ -162,17 +162,17 @@
         .table-custom tbody td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         /* BUTTONS */
-        .btn-primary-custom { background: linear-gradient(135deg, var(--primary), #3b82f6); border: none; color: white; padding: 10px 20px; border-radius: 10px; font-weight: 600; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); color: white; }
+        .btn-primary-custom { background: linear-gradient(135deg, var(--primary), #b91c1c); border: none; color: white; padding: 10px 20px; border-radius: 10px; font-weight: 600; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(239,68,68,0.3); color: white; }
         .btn-action { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: none; transition: 0.2s; color: white; text-decoration: none; }
-        .btn-action.edit { background: rgba(59,130,246,0.1); color: #3b82f6; }
-        .btn-action.edit:hover { background: #3b82f6; color: white; }
-        .btn-action.delete { background: rgba(239,68,68,0.1); color: #ef4444; }
-        .btn-action.delete:hover { background: #ef4444; color: white; }
+        .btn-action.edit { background: rgba(239,68,68,0.1); color: #ef4444; }
+        .btn-action.edit:hover { background: #ef4444; color: white; }
+        .btn-action.delete { background: rgba(153,27,27,0.1); color: #991b1b; }
+        .btn-action.delete:hover { background: #991b1b; color: white; }
 
         /* FORMS */
         .form-control, .form-select { border-radius: 10px; padding: 12px 15px; border: 1px solid #cbd5e1; font-size: 0.95rem; transition: 0.2s; background: #f8fafc; }
-        .form-control:focus, .form-select:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79,70,229,0.1); }
+        .form-control:focus, .form-select:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(239,68,68,0.1); }
         .form-label { font-weight: 600; color: #334155; margin-bottom: 8px; font-size: 0.9rem; }
 
         /* RESPONSIVE */
@@ -239,18 +239,68 @@
 
     <!-- CONTENT AREA -->
     <div class="content-area">
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" style="border-radius: 12px; border: none; background: #dcfce7; color: #166534;" role="alert">
-                <i class="fa-solid fa-circle-check me-2"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
 
         @yield('content')
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Konfigurasi Toast Custom (SweetAlert)
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3500,
+        timerProgressBar: true,
+        background: '#ffffff',
+        color: '#1e293b',
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    });
+
+    @if(session('success'))
+        Toast.fire({
+            icon: 'success',
+            title: "{!! session('success') !!}"
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: "{!! session('error') !!}",
+            confirmButtonColor: '#ef4444'
+        });
+    @endif
+
+    // Fungsi Konfirmasi Hapus Data
+    function confirmDelete(event, form) {
+        event.preventDefault();
+        let title = form.getAttribute('data-confirm-title') || 'Yakin hapus data?';
+        let text = form.getAttribute('data-confirm-text') || 'Data yang dihapus tidak bisa dikembalikan!';
+        
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+</script>
 @yield('scripts')
 </body>
 </html>

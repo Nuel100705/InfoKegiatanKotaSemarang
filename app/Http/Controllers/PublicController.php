@@ -13,15 +13,20 @@ class PublicController extends Controller
     public function home(\Illuminate\Http\Request $request)
     {
         $categories = Category::all();
-        $dateFilter = $request->query('date');
+        $dateRangeFilter = $request->query('date_range');
 
-        if ($dateFilter) {
-            $parsedDate = Carbon::parse($dateFilter);
+        if ($dateRangeFilter) {
+            $dates = explode(' to ', $dateRangeFilter);
+            $startDate = Carbon::parse($dates[0]);
+            $endDate = isset($dates[1]) ? Carbon::parse($dates[1]) : $startDate->copy();
+
             return view('public.home', [
                 'isFiltered' => true,
-                'filterDate' => $parsedDate,
-                'filteredEvents' => Event::whereDate('event_date', $parsedDate)
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'filteredEvents' => Event::whereBetween('event_date', [$startDate->toDateString(), $endDate->toDateString()])
                     ->orderBy('event_date')
+                    ->orderBy('jam')
                     ->get(),
                 'categories' => $categories,
             ]);

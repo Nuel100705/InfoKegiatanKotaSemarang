@@ -33,7 +33,7 @@
                             <a href="{{ route('categories.edit', $category->slug) }}" class="btn-action edit" title="Edit">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
-                            <form action="{{ route('categories.destroy', $category->slug) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus kategori ini? Semua kegiatan berelasi mungkin akan error jika tidak dipindah.')">
+                            <form action="{{ route('categories.destroy', $category->slug) }}" method="POST" class="d-inline" data-confirm-title="Hapus Kategori?" data-confirm-text="Semua kegiatan yang bertaut dengan kategori ini mungkin akan bermasalah. Lanjutkan?" onsubmit="confirmDelete(event, this)">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-action delete" title="Hapus">

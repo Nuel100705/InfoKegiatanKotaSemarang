@@ -60,7 +60,7 @@
                             <a href="{{ route('events.edit', $event->id) }}" class="btn-action edit" title="Edit">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
-                            <form action="{{ route('events.destroy', $event->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus kegiatan ini permanen?')">
+                            <form action="{{ route('events.destroy', $event->id) }}" method="POST" class="d-inline" data-confirm-title="Hapus Kegiatan?" data-confirm-text="Data kegiatan beserta file fotonya akan dihapus dari server." onsubmit="confirmDelete(event, this)">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-action delete" title="Hapus">
