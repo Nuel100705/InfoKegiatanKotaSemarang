@@ -295,7 +295,13 @@
                             <div class="info-value">
                                 {{ \Carbon\Carbon::parse($event->event_date)->isoFormat('dddd, D MMMM Y') }} 
                                 @if($event->jam)
-                                    <br><span class="text-primary"><i class="fa-regular fa-clock me-1"></i> {{ \Carbon\Carbon::parse($event->jam)->format('H:i') }} WIB</span>
+                                    <br><span class="text-primary"><i class="fa-regular fa-clock me-1"></i> {{ \Carbon\Carbon::parse($event->jam)->format('H:i') }} 
+                                    @if($event->jam_selesai)
+                                        - {{ \Carbon\Carbon::parse($event->jam_selesai)->format('H:i') }} WIB
+                                    @else
+                                        WIB - Selesai
+                                    @endif
+                                    </span>
                                 @endif
                             </div>
                         </div>
@@ -341,7 +347,9 @@
                         }
                         
                         $endDateTime = clone $startDateTime;
-                        if($event->jam) {
+                        if($event->jam_selesai) {
+                            $endDateTime->setTimeFromTimeString($event->jam_selesai);
+                        } elseif($event->jam) {
                             $endDateTime->addHours(2);
                         } else {
                             $endDateTime->endOfDay();

@@ -44,7 +44,14 @@
                     <td>
                         <div class="text-dark fw-medium"><i class="fa-regular fa-calendar text-muted me-1"></i> {{ \Carbon\Carbon::parse($event->event_date)->isoFormat('D MMM Y') }}</div>
                         @if($event->jam)
-                            <div class="small text-muted mt-1"><i class="fa-regular fa-clock me-1"></i> {{ \Carbon\Carbon::parse($event->jam)->format('H:i') }} WIB</div>
+                            <div class="small text-muted mt-1">
+                                <i class="fa-regular fa-clock me-1"></i> {{ \Carbon\Carbon::parse($event->jam)->format('H:i') }} 
+                                @if($event->jam_selesai)
+                                    - {{ \Carbon\Carbon::parse($event->jam_selesai)->format('H:i') }} WIB
+                                @else
+                                    WIB - Sels.
+                                @endif
+                            </div>
                         @endif
                     </td>
                     <td>

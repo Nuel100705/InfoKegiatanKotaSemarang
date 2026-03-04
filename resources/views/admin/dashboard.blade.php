@@ -4,25 +4,18 @@
 
 @section('content')
 <div class="row g-4">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <div class="admin-card text-center d-flex flex-column align-items-center justify-content-center" style="background: linear-gradient(135deg, #4f46e5, #3b82f6); color: white;">
             <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.9;"><i class="fa-solid fa-tags"></i></div>
             <h5 style="font-weight: 600; font-size: 1.1rem; opacity: 0.9;">Total Kategori</h5>
             <h2 style="font-weight: 800; font-size: 2.5rem; margin: 0;">{{ \App\Models\Category::count() }}</h2>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
         <div class="admin-card text-center d-flex flex-column align-items-center justify-content-center" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
             <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.9;"><i class="fa-solid fa-calendar-check"></i></div>
-            <h5 style="font-weight: 600; font-size: 1.1rem; opacity: 0.9;">Total Kegeiatan</h5>
+            <h5 style="font-weight: 600; font-size: 1.1rem; opacity: 0.9;">Total Kegiatan</h5>
             <h2 style="font-weight: 800; font-size: 2.5rem; margin: 0;">{{ \App\Models\Event::count() }}</h2>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="admin-card text-center d-flex flex-column align-items-center justify-content-center" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
-            <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.9;"><i class="fa-solid fa-envelope-open-text"></i></div>
-            <h5 style="font-weight: 600; font-size: 1.1rem; opacity: 0.9;">Pengingat Aktif</h5>
-            <h2 style="font-weight: 800; font-size: 2.5rem; margin: 0;">{{ \App\Models\EventReminder::where('sent', false)->count() }}</h2>
         </div>
     </div>
 </div>

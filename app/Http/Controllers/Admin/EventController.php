@@ -30,6 +30,7 @@ class EventController extends Controller
             'category_id' => 'required|exists:categories,id',
             'event_date'  => 'required|date',
             'jam'         => 'required',
+            'jam_selesai' => 'nullable',
             'description' => 'required',
             'location'    => 'required',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -53,6 +54,7 @@ class EventController extends Controller
      'category_id' => $request->category_id,
      'event_date'  => $request->event_date,
      'jam'         => \Carbon\Carbon::parse($request->jam)->format('H:i'),
+     'jam_selesai' => $request->jam_selesai ? \Carbon\Carbon::parse($request->jam_selesai)->format('H:i') : null,
      'description' => $request->description,
     'location'    => $request->location,
     'latitude'    => $request->latitude,
@@ -79,6 +81,7 @@ class EventController extends Controller
         'category_id' => 'required|exists:categories,id',
         'event_date'  => 'required|date',
         'jam'         => 'required',
+        'jam_selesai' => 'nullable',
         'description' => 'required',
         'location'    => 'required',
         'latitude'    => 'required',   // 🔥 TAMBAHKAN
@@ -105,6 +108,7 @@ class EventController extends Controller
         'category_id' => $request->category_id,
         'event_date'  => $request->event_date,
         'jam'         => \Carbon\Carbon::parse($request->jam)->format('H:i'),
+        'jam_selesai' => $request->jam_selesai ? \Carbon\Carbon::parse($request->jam_selesai)->format('H:i') : null,
         'description' => $request->description,
         'location'    => $request->location,
         'latitude'    => $request->latitude,   // 🔥 WAJIB

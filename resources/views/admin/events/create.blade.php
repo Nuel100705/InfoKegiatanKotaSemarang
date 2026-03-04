@@ -47,9 +47,13 @@
                         <label class="form-label">Tanggal Pelaksanaan <span class="text-danger">*</span></label>
                         <input type="date" name="event_date" class="form-control" value="{{ old('event_date') }}" required>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Jam</label>
-                        <input type="text" name="jam" class="form-control timepicker bg-white" placeholder="Pilih Jam (AM/PM)" value="{{ old('jam') }}" readonly style="cursor: pointer;">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Jam Mulai <span class="text-danger">*</span></label>
+                        <input type="text" name="jam" class="form-control timepicker bg-white" placeholder="Pilih Jam Mulai" value="{{ old('jam') }}" readonly style="cursor: pointer;" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Jam Selesai (Opsional)</label>
+                        <input type="text" name="jam_selesai" class="form-control timepicker bg-white" placeholder="Pilih Jam Selesai" value="{{ old('jam_selesai') }}" readonly style="cursor: pointer;">
                     </div>
                 </div>
 
